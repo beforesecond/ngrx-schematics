@@ -1,0 +1,17 @@
+{
+  "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "ngrx-schematics": {
+      "description": "Generate NGRX Store Schematics.",
+      "factory": "./ngrx-schematics",
+      "aliases": ["store"],
+      "schema": "./ngrx-schematics/schema.json"
+    },
+    "ngrx-root": {
+      "description": "Generate NGRX Root Schematics.",
+      "factory": "./ngrx-root",
+      "aliases": ["root"],
+      "schema": "./ngrx-root/schema.json"
+    }
+  }
+}
