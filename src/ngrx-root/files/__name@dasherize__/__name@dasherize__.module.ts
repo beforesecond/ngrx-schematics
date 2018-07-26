@@ -16,4 +16,4 @@ import { reducers, metaReducers } from './<%=dasherize(name)%>-logger'
   ],
   declarations: []
 })
-export class <%= classify(name) %>StoreModule { }
+export class <%= classify(name) %>Module { }

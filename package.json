@@ -9,6 +9,10 @@
   "keywords": [
     "NGRX"
   ],
+  "repository": { 
+    "type": "git",
+    "url": "https://github.com/beforesecond/ngrx-schematics"
+  },
   "author": "BeforeSecond",
   "license": "MIT",
   "schematics": "./src/collection.json",
