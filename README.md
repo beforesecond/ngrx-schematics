@@ -1,28 +1,12 @@
 # Getting Started With Schematics
 
-This repository is a basic Schematic implementation that serves as a starting point to create and publish Schematics to NPM.
+    Please install `npm i ngrx-schematics@latest --save`
 
-### Testing
+### Example How To Use
+    `ng g ngrx-schematics:root root`  for generate root store
+    
+    `ng g ngrx-schematics:store root-store/feature` for generate feature store
 
-To test locally, install `@angular-devkit/schematics` globally and use the `schematics` command line tool. That tool acts the same as the `generate` command of the Angular CLI, but also has a debug mode.
-
-Check the documentation with
-```bash
-schematics --help
-```
-
-### Unit Testing
-
-`npm run test` will run the unit tests, using Jasmine as a runner and test framework.
-
-### Publishing
-
-To publish, simply do:
-
-```bash
-npm run build
-npm publish
-```
-
-That's it!
- 
+### Required Dependencies
+    "@ngrx/effects",    "@ngrx/entity",    "@ngrx/store",
+    "@ngrx/store-devtools",    "ngrx-store-logger"

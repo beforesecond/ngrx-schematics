@@ -1,15 +1,15 @@
 {
   "name": "ngrx-schematics",
-  "version": "0.0.0",
-  "description": "A blank schematics",
+  "version": "1.0.5",
+  "description": "NGRX Schematics",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "npm run build && jasmine src/**/*_spec.js"
   },
   "keywords": [
-    "schematics"
+    "NGRX"
   ],
-  "author": "",
+  "author": "BeforeSecond",
   "license": "MIT",
   "schematics": "./src/collection.json",
   "dependencies": {

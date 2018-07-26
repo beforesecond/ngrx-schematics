@@ -1,16 +1,16 @@
 import { createSelector, MemoizedSelector } from '@ngrx/store';
 
-import { FeatureSelectors } from './feature-store';
+import { FeatureStoreSelectors } from './feature-store';
 
 export const selectError: MemoizedSelector<object, string> = createSelector(
-  FeatureSelectors.selectFeatureError,
+  FeatureStoreSelectors.selectFeatureError,
   (Error: string) => {
     return Error;
   }
 );
 
 export const selectIsLoading: MemoizedSelector<object, boolean> = createSelector(
-  FeatureSelectors.selectFeatureIsLoading,
+  FeatureStoreSelectors.selectFeatureIsLoading,
   (loading: boolean) => {
     return loading;
   }

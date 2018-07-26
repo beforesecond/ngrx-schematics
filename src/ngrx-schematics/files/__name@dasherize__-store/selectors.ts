@@ -12,6 +12,6 @@ export const select<%= classify(name) %>IsLoading: MemoizedSelector<object, bool
     select<%= classify(name) %>State,
     (state: State): any => state.isLoading);
 
-export const select<%= classify(name) %>User: MemoizedSelector<object, any> = createSelector(
+export const select<%= classify(name) %>: MemoizedSelector<object, any> = createSelector(
     select<%= classify(name) %>State,
     (state: State): any => state.data);

@@ -14,4 +14,4 @@ import { <%= classify(name) %>Reducer } from './reducer';
   declarations: [],
   providers: [<%= classify(name) %>Effects]
 })
-export class <%= classify(name) %>StoreModule { }
+export class <%= classify(name) %>Module { }
