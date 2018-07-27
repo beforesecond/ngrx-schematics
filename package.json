@@ -1,6 +1,6 @@
 {
   "name": "ngrx-schematics",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "description": "NGRX Schematics",
   "scripts": {
     "build": "tsc -p tsconfig.json",
