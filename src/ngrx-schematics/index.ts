@@ -45,7 +45,7 @@ export default function (options: NgrxOptions): Rule {
       options.name = parsedPath.name;
       options.path = parsedPath.path;
 
-      console.log('options', options);
+      //console.log('options', options);
 
       const templateSource = apply(url('./files'), [
         filterTemplates(options),
@@ -54,7 +54,7 @@ export default function (options: NgrxOptions): Rule {
           ...options
         }),
         () => { 
-          console.debug('pathfiles', parsedPath.path )
+          //console.debug('pathfiles', parsedPath.path )
         },
         move(parsedPath.path)
       ]);

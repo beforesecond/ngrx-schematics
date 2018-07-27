@@ -9,7 +9,7 @@
   "keywords": [
     "NGRX"
   ],
-  "repository": { 
+  "repository": {
     "type": "git",
     "url": "https://github.com/beforesecond/ngrx-schematics"
   },
