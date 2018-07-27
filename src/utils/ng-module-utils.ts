@@ -17,7 +17,7 @@ const { dasherize, classify } = strings;
 
 // Referencing forked and copied private APIs 
 import { ModuleOptions, buildRelativePath } from '../schematics-angular-utils/find-module';
-import { addDeclarationToModule, addExportToModule } from '../schematics-angular-utils/ast-utils';
+import { addDeclarationToModule, addExportToModule, addImportToModule } from '../schematics-angular-utils/ast-utils';
 import { InsertChange } from '../schematics-angular-utils/change';
 
 const stringUtils = { dasherize, classify };
@@ -25,6 +25,16 @@ const stringUtils = { dasherize, classify };
 export function addDeclarationToNgModule(options: ModuleOptions, exports: boolean): Rule {
   return (host: Tree) => {
     addDeclaration(host, options);
+    if (exports) {
+      addExport(host, options);
+    }
+    return host;
+  };
+}
+
+export function addImportToNgModule(options: ModuleOptions, exports: boolean): Rule {
+  return (host: Tree) => {
+    addImport(host, options);
     if (exports) {
       addExport(host, options);
     }
@@ -49,13 +59,42 @@ function createAddToModuleContext(host: Tree, options: ModuleOptions): AddToModu
   result.source = ts.createSourceFile(options.module, sourceText, ts.ScriptTarget.Latest, true);
 
   const componentPath = `${options.path}/`
-      + stringUtils.dasherize(options.name) + '/'
-      + stringUtils.dasherize(options.name)
-      + '.component';
+    + stringUtils.dasherize(options.name) + '/'
+    + stringUtils.dasherize(options.name)
+    + '.component';
 
   result.relativePath = buildRelativePath(options.module, componentPath);
 
   result.classifiedName = stringUtils.classify(`${options.name}Component`);
+
+  return result;
+
+}
+
+function createAddToModuleContextModule(host: Tree, options: ModuleOptions): AddToModuleContext {
+
+  const result = new AddToModuleContext();
+
+  if (!options.module) {
+    throw new SchematicsException(`Module not found.`);
+  }
+
+  const text = host.read(options.module);
+
+  if (text === null) {
+    throw new SchematicsException(`File ${options.module} does not exist!`);
+  }
+  const sourceText = text.toString('utf-8');
+  result.source = ts.createSourceFile(options.module, sourceText, ts.ScriptTarget.Latest, true);
+
+  const componentPath = `${options.path}/`
+    + stringUtils.dasherize(options.name) + '/'
+    + stringUtils.dasherize(options.name)
+    + '.module';
+
+  result.relativePath = buildRelativePath(options.module, componentPath);
+
+  result.classifiedName = stringUtils.classify(`${options.name}Module`);
 
   return result;
 
@@ -68,8 +107,8 @@ function addDeclaration(host: Tree, options: ModuleOptions) {
 
   const declarationChanges = addDeclarationToModule(context.source,
     modulePath,
-      context.classifiedName,
-      context.relativePath);
+    context.classifiedName,
+    context.relativePath);
 
   const declarationRecorder = host.beginUpdate(modulePath);
   for (const change of declarationChanges) {
@@ -80,14 +119,33 @@ function addDeclaration(host: Tree, options: ModuleOptions) {
   host.commitUpdate(declarationRecorder);
 };
 
+function addImport(host: Tree, options: ModuleOptions) {
+
+  const context = createAddToModuleContextModule(host, options);
+  const modulePath = options.module || '';
+
+  const importChanges = addImportToModule(context.source,
+    modulePath,
+    context.classifiedName,
+    context.relativePath);
+
+  const importRecorder = host.beginUpdate(modulePath);
+  for (const change of importChanges) {
+    if (change instanceof InsertChange) {
+      importRecorder.insertLeft(change.pos, change.toAdd);
+    }
+  }
+  host.commitUpdate(importRecorder);
+};
+
 function addExport(host: Tree, options: ModuleOptions) {
   const context = createAddToModuleContext(host, options);
   const modulePath = options.module || '';
 
   const exportChanges = addExportToModule(context.source,
-      modulePath,
-      context.classifiedName,
-      context.relativePath);
+    modulePath,
+    context.classifiedName,
+    context.relativePath);
 
   const exportRecorder = host.beginUpdate(modulePath);
 

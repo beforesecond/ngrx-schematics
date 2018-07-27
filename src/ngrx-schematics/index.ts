@@ -2,7 +2,7 @@ import { chain, mergeWith } from '@angular-devkit/schematics';
 import { NgrxOptions } from './schema';
 import { apply, filter, move, Rule, template, url, branchAndMerge, Tree, SchematicContext } from '@angular-devkit/schematics';
 import { strings } from '@angular-devkit/core';
-//import { addDeclarationToNgModule } from '../utils/ng-module-utils';
+import { addImportToNgModule } from '../utils/ng-module-utils';
 import { findModuleFromOptions } from '../schematics-angular-utils/find-module';
 //import { injectServiceIntoAppComponent } from '../utils/add-injection';
 
@@ -62,7 +62,8 @@ export default function (options: NgrxOptions): Rule {
       const rule = chain([
         branchAndMerge(chain([
           mergeWith(templateSource),
-          
+
+          addImportToNgModule(options, options.export), 
        //   addDeclarationToNgModule(options, options.export),
        //   injectServiceIntoAppComponent(options)
         ]))
