@@ -69,7 +69,7 @@ describe('find-module', () => {
     let options: ModuleOptions;
     beforeEach(() => {
       tree = new EmptyTree();
-      options = { name: 'foo' };
+      options = { name: 'foo'};
     });
 
     it('should find a module', () => {

@@ -1,19 +1,20 @@
 {
   "name": "ngrx-schematics",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "NGRX Schematics",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "npm run build && jasmine src/**/*_spec.js"
   },
   "keywords": [
-    "NGRX"
+    "NGRX",
+    "NGEX Schematics"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/beforesecond/ngrx-schematics"
   },
-  "author": "BeforeSecond",
+  "author": "BeforeSecond,Firstnaruto",
   "license": "MIT",
   "schematics": "./src/collection.json",
   "dependencies": {

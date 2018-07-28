@@ -20,10 +20,10 @@ interface AddInjectionContext {
 }
 
 function findFileByName(file: string, path: string, host: Tree): string {
-    
+
     let dir: DirEntry | null = host.getDir(path);
 
-    while(dir) {
+    while (dir) {
         let appComponentFileName = dir.path + '/' + file;
         if (host.exists(appComponentFileName)) {
             return appComponentFileName;
@@ -33,12 +33,17 @@ function findFileByName(file: string, path: string, host: Tree): string {
     throw new SchematicsException(`File ${file} not found in ${path} or one of its anchestors`);
 }
 
-function createAddInjectionContext(options: ModuleOptions, host: Tree): AddInjectionContext {
-    
-    let appComponentFileName = findFileByName('app.component.ts', options.path || '/', host);
+function createAddInjectionContext(options: ModuleOptions, host: Tree,name:string): AddInjectionContext {
+
+    let nameRoot = options.name;
+    nameRoot = nameRoot.substr(0, nameRoot.indexOf('/'))
+   // console.log(nameRoot)
+
+    let appComponentFileName = findFileByName(name + '-selectors.ts', options.path || '/', host);
     let destinationPath = constructDestinationPath(options);
-    let serviceName = classify(`${options.name}Service`);
-    let serviceFileName = join(normalize(destinationPath), `${dasherize(options.name)}.service`);
+    let serviceName = classify(`${options.name}Selectors`);
+    let serviceFileName = join(normalize(destinationPath), `${dasherize(options.name)}`);
+    serviceFileName = join(normalize(destinationPath), `${dasherize('')}`);
     let relativeServiceFileName = buildRelativePath(appComponentFileName, serviceFileName);
 
     return {
@@ -48,14 +53,14 @@ function createAddInjectionContext(options: ModuleOptions, host: Tree): AddInjec
     }
 }
 
-export function injectServiceIntoAppComponent(options: ModuleOptions): Rule {
-    console.log('injectServiceIntoAppComponent');
+export function injectSelectors6IntoAppComponent(options: ModuleOptions, name: string): Rule {
+    // console.log('injectServiceIntoAppComponent');
     return (host: Tree) => {
 
-        let context = createAddInjectionContext(options, host);
+        let context = createAddInjectionContext(options, host, name);
 
         let changes = buildInjectionChanges(context, host, options);
-        
+
         const declarationRecorder = host.beginUpdate(context.appComponentFileName);
         for (let change of changes) {
             if (change instanceof InsertChange) {
@@ -63,11 +68,11 @@ export function injectServiceIntoAppComponent(options: ModuleOptions): Rule {
             }
         }
         host.commitUpdate(declarationRecorder);
-    
+
         return host;
     };
 };
-  
+
 function buildInjectionChanges(context: AddInjectionContext, host: Tree, options: ModuleOptions): Change[] {
 
     let text = host.read(context.appComponentFileName);
@@ -78,33 +83,33 @@ function buildInjectionChanges(context: AddInjectionContext, host: Tree, options
     //console.log(sourceFile)
     let nodes = getSourceNodes(sourceFile);
     let ctorNode = nodes.find(n => n.kind == ts.SyntaxKind.Constructor);
-    
+
     let constructorChange: Change;
 
     if (!ctorNode) {
         // No constructor found
-        constructorChange = createConstructorForInjection(context, nodes, options);
-    } 
-    else { 
+        constructorChange = createExportSelectorsForInjection(context, nodes, options);
+    }
+    else {
         constructorChange = addConstructorArgument(context, ctorNode, options);
     }
 
     return [
         constructorChange,
-        insertImport(sourceFile, context.appComponentFileName, context.serviceName, context.relativeServiceFileName) 
+        insertImport(sourceFile, context.appComponentFileName, context.serviceName, context.relativeServiceFileName)
     ];
 
 }
 
 function addConstructorArgument(context: AddInjectionContext, ctorNode: ts.Node, options: ModuleOptions): Change {
 
-    if(options){
+    if (options) {
 
     }
     let siblings = ctorNode.getChildren();
-   
+
     let parameterListNode = siblings.find(n => n.kind === ts.SyntaxKind.SyntaxList);
-    
+
     if (!parameterListNode) {
         throw new SchematicsException(`expected constructor in ${context.appComponentFileName} to have a parameter list`);
     }
@@ -124,19 +129,19 @@ function addConstructorArgument(context: AddInjectionContext, ctorNode: ts.Node,
     else if (!paramNode && parameterNodes.length > 0) {
         let toAdd = `,
     private ${camelize(context.serviceName)}: ${classify(context.serviceName)}`;
-        let lastParameter = parameterNodes[parameterNodes.length-1];
+        let lastParameter = parameterNodes[parameterNodes.length - 1];
         return new InsertChange(context.appComponentFileName, lastParameter.end, toAdd);
-        
+
     }
 
     return new NoopChange();
 }
 
-function findSuccessor(node: ts.Node, searchPath: ts.SyntaxKind[] ) {
+function findSuccessor(node: ts.Node, searchPath: ts.SyntaxKind[]) {
     let children = node.getChildren();
     let next: ts.Node | undefined = undefined;
 
-    for(let syntaxKind of searchPath) {
+    for (let syntaxKind of searchPath) {
         next = children.find(n => n.kind == syntaxKind);
         if (!next) return null;
         children = next.getChildren();
@@ -145,52 +150,21 @@ function findSuccessor(node: ts.Node, searchPath: ts.SyntaxKind[] ) {
 }
 
 
-function createConstructorForInjection(context: AddInjectionContext, nodes: ts.Node[], options: ModuleOptions): Change {
-    let classNode = nodes.find(n => n.kind === ts.SyntaxKind.ClassKeyword);
-    
-    if(options){
+function createExportSelectorsForInjection(context: AddInjectionContext, nodes: ts.Node[], options: ModuleOptions): Change {
+    let classNode = nodes.find(n => n.kind === ts.SyntaxKind.SourceFile);
+    if(nodes&&options){
 
     }
-
     if (!classNode) {
         throw new SchematicsException(`expected class in ${context.appComponentFileName}`);
     }
-    
-    if (!classNode.parent) {
-        throw new SchematicsException(`expected constructor in ${context.appComponentFileName} to have a parent node`);
-    }
-
-    let siblings = classNode.parent.getChildren();
-    let classIndex = siblings.indexOf(classNode);
-
-    siblings = siblings.slice(classIndex);
-
-    let classIdentifierNode = siblings.find(n => n.kind === ts.SyntaxKind.Identifier);
-
-    if (!classIdentifierNode) {
-        throw new SchematicsException(`expected class in ${context.appComponentFileName} to have an identifier`);
-    }
-
-    if (classIdentifierNode.getText() !== 'AppComponent') {
-        throw new SchematicsException(`expected first class in ${context.appComponentFileName} to have the name AppComponent`);
-    }
-
-    let curlyNodeIndex = siblings.findIndex(n => n.kind === ts.SyntaxKind.FirstPunctuation);
-
-    siblings = siblings.slice(curlyNodeIndex);
-
-    let listNode = siblings.find(n => n.kind === ts.SyntaxKind.SyntaxList);
-
-    if (!listNode) {
-        throw new SchematicsException(`expected first class in ${context.appComponentFileName} to have a body`);
-    }
-
+    let posintion = classNode.getText().indexOf(`return loading`)+(`return loading`).length
+    let selectValue = classify(`${options.name}`);
     let toAdd = `
-  constructor(private ${camelize(context.serviceName)}: ${classify(context.serviceName)}) {
-    // ${camelize(context.serviceName)}.show = true;
-  }
-`;
-    return new InsertChange(context.appComponentFileName, listNode.pos+1, toAdd);
+     || ${selectValue}IsLoading
+     `;
+
+    return new InsertChange(context.appComponentFileName, posintion, toAdd);
 
 }
 

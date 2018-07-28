@@ -5,4 +5,5 @@ export interface NgrxOptions {
     module?: string;
     export : boolean;
     ngrxService?: boolean;
+    rootStore : string;
 }
